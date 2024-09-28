@@ -13,7 +13,7 @@ function Header({ records }) {
   const IP_ADDRESS = process.env.VITE_IP_ADDRESS;
   const query = new URLSearchParams(location.search);
   const LibraryId = query.get("id");
-  let libraryData = records.find((item) => item.LIB_ID == LibraryId);
+  let libraryData = records.find((item) => item._id == LibraryId);
   let username = libraryData && libraryData.CREATE_BY;
   const loggedInUsername = sessionStorage.getItem("username");
   const loggedInUsernameRole = sessionStorage.getItem("admin");
@@ -33,13 +33,12 @@ function Header({ records }) {
     if (records && records.length === 0) {
       navigate("/AddLibrary");
     } else if (handleDelete && records ) {
-      navigate(`/content?id=${records[records.length-1].LIB_ID}`);
+      navigate(`/content?id=${records[records.length-1]._id}`);
     }
   }, []);
 
   // function delete
   const handleDelete = async (id) => {
-    
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: "btn btn-success swal2-confirm",
@@ -47,7 +46,7 @@ function Header({ records }) {
       },
       buttonsStyling: false,
     });
-
+  
     swalWithBootstrapButtons
       .fire({
         title: "Are you sure?",
@@ -62,19 +61,31 @@ function Header({ records }) {
         if (result.isConfirmed) {
           try {
             setLoading(true);
-            await axios.delete(
-              `${IP_ADDRESS}/delete/library/${id}`
-            );
-            swalWithBootstrapButtons
-              .fire({
-                title: "Deleted!",
-                text: "",
-                // text: response.data.message,
-                icon: "success",
-              })
-              .then(() => {
-                navigate(`/DeleteLibrary?id=${id}`);
-              });
+            // Send delete request to the server
+            await axios.delete(`${IP_ADDRESS}/library/delete/library/${id}`);
+            
+            // Show success alert
+            const successResult = await swalWithBootstrapButtons.fire({
+              title: "Deleted!",
+              text: "The item has been deleted successfully.",
+              icon: "success",
+              confirmButtonText: "OK",
+            });
+  
+            // Navigate to the last record or AddLibrary if none are left
+            const updatedRecords = records.filter((item) => item._id !== id);
+  
+            if (updatedRecords.length > 0) {
+              // Navigate to the last record if any exist
+              navigate(`/content?id=${updatedRecords[updatedRecords.length - 1]._id}`);
+            } else {
+              // If no records left, navigate to the AddLibrary page
+              navigate("/AddLibrary");
+            }
+            // Reload the page after successful navigation
+            if (successResult.isConfirmed) {
+              window.location.reload();
+            }
           } catch (error) {
             console.error("Error deleting record:", error);
             swalWithBootstrapButtons.fire({
@@ -82,21 +93,19 @@ function Header({ records }) {
               text: "There was an error deleting the record.",
               icon: "error",
             });
+          } finally {
+            setLoading(false);
           }
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons
-            .fire({
-              title: "Cancelled",
-              text: "",
-              icon: "error",
-            })
-            .then(() => {
-              window.location.reload();
-            });
+          swalWithBootstrapButtons.fire({
+            title: "Cancelled",
+            text: "",
+            icon: "error",
+          });
         }
-        setLoading(false);
       });
   };
+  
 
   return (
     <>
@@ -105,7 +114,7 @@ function Header({ records }) {
         <nav className="navbar">
           <div className="logo">
             {records && records.length > 0 ? (
-              <NavLink to={`/content?id=${records[records.length-1].LIB_ID}`}>
+              <NavLink to={`/content?id=${records[records.length-1]._id}`}>
                 <img
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/cae4fb078c75a656bef67378beae8c2fee523fff5a7fff8caed98f6ea5f85c35?apiKey=b53945e59ede4d0cb34670777c19b8a0&"
                   alt="Systory Library Logo"

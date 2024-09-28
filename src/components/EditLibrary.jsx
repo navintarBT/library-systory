@@ -23,7 +23,7 @@ function EditLibrary({ records }) {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
   const LibraryId = query.get("id");
-  let libraryData = records.find((item) => item.LIB_ID == LibraryId);
+  let libraryData = records.find((item) => item._id == LibraryId);
   // form
   const [id, setId] = useState("");
   const [libraryName, setLibraryName] = useState("");
@@ -60,7 +60,7 @@ function EditLibrary({ records }) {
         for (let fileInfo of files) {
           // Fetch each file
           let filename = formDataKey == 'files' ? fileInfo.filename : fileInfo;
-          let response = await axios.get(`${IP_ADDRESS}/files/${filename}`, {
+          let response = await axios.get(`${IP_ADDRESS}/library/files/${filename}`, {
             responseType: 'arraybuffer' // Ensure the response is in binary format
           });
           // Create a Blob from the response data
@@ -87,7 +87,7 @@ function EditLibrary({ records }) {
 
     const fetchData = async () => {
       try {
-        let fileArray = libraryData.ATTRACHMENT;
+        let fileArray = JSON.parse(libraryData.ATTRACHMENT);
         // Set files with the details
         setFiles(await getRawFile(fileArray, 'files'));
         // Set files with the details
@@ -97,7 +97,7 @@ function EditLibrary({ records }) {
       }
     };
     if (libraryData) {
-      setId(libraryData.LIB_ID);
+      setId(libraryData._id);
       setLibraryName(libraryData.LIB_NAME || "");
       setDescription(libraryData.DESCRIPTION || "");
       setReference(libraryData.REFERENCE || "");
@@ -107,14 +107,16 @@ function EditLibrary({ records }) {
       setOverviewDes(libraryData.DESCRIPTIONS_OVER || "");
       setSuggestionDes(libraryData.DESCRIPTIONS_SGT || "");
 
-      setRowsInstallations(libraryData.INSTALLATION);
+      setRowsInstallations(JSON.parse(libraryData.INSTALLATION));
       setIdCounterInstallation(libraryData.INSTALLATION.length + 1);
-      setRowsHowToUse(libraryData.HOWTOUSE);
+      setRowsHowToUse(JSON.parse(libraryData.HOWTOUSE));
       setIdCounterHowToUse(libraryData.HOWTOUSE.length + 1);
-      setRowsExamPle(libraryData.EXAMPLE);
+      setRowsExamPle(JSON.parse(libraryData.EXAMPLE));
       setIdCounterExamPle(libraryData.EXAMPLE.length + 1);
       fetchData();
     }
+    console.log(libraryData.INSTALLATION);
+    
   }, [libraryData]);
 
   // created functions keep input value
@@ -268,9 +270,11 @@ function EditLibrary({ records }) {
     };
 
     formData.append("record", JSON.stringify(record));
+    console.log(...formData);
+    
     try {
       await axios
-        .put(`${IP_ADDRESS}/Update/Data/${libraryData.LIB_ID}`, formData, {
+        .put(`${IP_ADDRESS}/library/Update/Data/${libraryData._id}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

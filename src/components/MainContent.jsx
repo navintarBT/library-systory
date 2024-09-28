@@ -16,7 +16,7 @@ function MainContent({ records }) {
   const query = new URLSearchParams(location.search);
   const LibraryId = query.get("id");
   let libraryData = records
-    ? records.find((item) => item.LIB_ID == LibraryId)
+    ? records.find((item) => item._id == LibraryId)
     : null;
   
   if (!libraryData) {
@@ -37,13 +37,14 @@ function MainContent({ records }) {
     HOWTOUSE,
     EXAMPLE
   } = libraryData;
+console.log(libraryData.IMAGE);
 
   
   useEffect(() => {
-      if(libraryData.ATTRACHMENT) setAttrachment(libraryData.ATTRACHMENT);
-        setInstallation(INSTALLATION);
-        setHowToUse(HOWTOUSE);
-        setExample(EXAMPLE);
+      if(libraryData.ATTRACHMENT) setAttrachment(JSON.parse(libraryData.ATTRACHMENT));
+        setInstallation(JSON.parse(INSTALLATION));
+        setHowToUse(JSON.parse(HOWTOUSE));
+        setExample(JSON.parse(EXAMPLE));
   }, [libraryData]);
 
   function formatFileSize(bytes) {
@@ -70,7 +71,7 @@ function MainContent({ records }) {
                 {IMAGE ? (
                   <>
                     <img
-                      src={`../../server/src/uploads/${IMAGE}`}
+                      src={`../../backend/public/images/users/${libraryData.IMAGE}`}
                       alt="Item Image"
                       className="libraly-img"
                     />
@@ -151,7 +152,7 @@ function MainContent({ records }) {
                   attrachment.map((file, index) => (
                     <div className="link-item" key={index}>
                       <a
-                        href={'../../server/src/uploads/'+file.filename}
+                        href={'../../backend/public/images/users/'+file.filename}
                         download={file.originalname}
                         className="link"
                         key={file.filename}

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import reactLogo from "./assets/react.svg";
 import {
   BrowserRouter,
   NavLink,
@@ -8,7 +7,6 @@ import {
   useNavigate,
 } from "react-router-dom";
 import axios from "axios";
-import viteLogo from "/vite.svg";
 import Header from "./components/Header";
 import SideBar from "./components/SideBar";
 import MainContent from "./components/MainContent";
@@ -31,7 +29,8 @@ function App() {
     async function fetchRecords() {
       try {
         setLoading(true);
-        const response = await axios.get(`${IP_ADDRESS}/`);
+        const response = await axios.get(`${IP_ADDRESS}/library/`);
+        console.log(response)
         setRecords(response.data);
         
       } catch (error) {

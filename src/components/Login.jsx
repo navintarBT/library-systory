@@ -13,6 +13,8 @@ const Login = (props) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { records } = props;
+  console.log(records);
+  
 
   useEffect(() => {
     const username = sessionStorage.getItem("username");
@@ -21,9 +23,9 @@ const Login = (props) => {
       username &&
       records &&
       records.length > 0 &&
-      records[records.length-1].LIB_ID
+      records[records.length-1]._id
     ) {
-      navigate(`/content?id=${records[records.length-1].LIB_ID}`);
+      navigate(`/content?id=${records[0]._id}`);
     } else if (records && records.length > 0) {
       navigate("/");
     }
@@ -32,12 +34,14 @@ const Login = (props) => {
   const onLogin = async () => {
     setLoading(true);
     try {
+      console.log(userInput,password);
+      
       if (!userInput || !password) return;
-      const response = await axios.post(`${IP_ADDRESS}/getUser`, {
+      const response = await axios.post(`${IP_ADDRESS}/library/getUser`, {
         userInput,
         password,
       });
-      let user = response.data;
+      let user = response.data;      
       if (user.length > 0) {
         sessionStorage.setItem("username", user[0].name);
         sessionStorage.setItem("admin", user[0].role);

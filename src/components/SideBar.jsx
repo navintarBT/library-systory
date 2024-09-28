@@ -14,9 +14,10 @@ function SideBar({ records }) {
   if (!records && records.length > 0) {
     return null;
   }
-  const filteredLibraries = records.filter((item) =>
-    item.LIB_NAME.toLowerCase().includes(search.toLowerCase())
-  ).sort((a, b) => b.LIB_ID - a.LIB_ID);
+  const filteredLibraries = records
+  .filter((item) => item.LIB_NAME.toLowerCase().includes(search.toLowerCase()))
+  .sort((a, b) => b._id.toString().localeCompare(a._id.toString())); // Descending order based on _id
+
 
   return (
     <>
@@ -32,9 +33,9 @@ function SideBar({ records }) {
             {filteredLibraries.map((library, index) => (
               <NavLink
                 key={index}
-                to={`/content?id=${library.LIB_ID}`}
+                to={`/content?id=${library._id}`}
                 className={`library-item ${
-                  activeLibraryId == library.LIB_ID ? "selected" : ""
+                  activeLibraryId == library._id ? "selected" : ""
                 }`}
               >
                 <div className="library-indicator" />

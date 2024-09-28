@@ -12,6 +12,8 @@ function AddLibrary() {
 
   useEffect(() => {
     const isLoggedIn = sessionStorage.getItem("username");
+    console.log(isLoggedIn);
+    
     if (!isLoggedIn) {
       navigate("/");
     }
@@ -190,8 +192,10 @@ function AddLibrary() {
       rowsExample,
     };
     formData.append("data", JSON.stringify(data));
+    console.log(...formData);
+    
     try {
-      await axios.post(`${IP_ADDRESS}/addLibrary`, formData, {
+      await axios.post(`${IP_ADDRESS}/library/create-library`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
