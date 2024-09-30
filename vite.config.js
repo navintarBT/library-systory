@@ -9,7 +9,7 @@ export default defineConfig({
   },
   define:{
     'process.env':{
-      VITE_IP_ADDRESS:'http://localhost:4001'
+      VITE_IP_ADDRESS:'http://localhost:3001'
     }
   }
 });

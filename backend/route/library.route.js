@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { User, AddLibrarySchema } = require('../models/Library'); // Adjust the path if needed
+const { User, AddLibrarySchema } = require('../models/Library');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -8,17 +8,17 @@ const fs = require('fs');
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './backend/public/images/users'); // Directory for storing files
+    cb(null, './backend/public/images/users'); 
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname); // Rename the file with a timestamp
+    cb(null, Date.now() + '-' + file.originalname); 
   }
 });
 
 // Initialize multer with storage and file size limit
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 500000000 } // 500 MB limit
+  limits: { fileSize: 500000000 } 
 }).fields([
   { name: 'files', maxCount: 10 },
   { name: 'image', maxCount: 1 }
@@ -99,7 +99,6 @@ router.put('/Update/Data/:id', upload, async (req, res) => {
     const { id: update_id } = req.params;
     let image = '';
     const imageFile = req.files ? req.files.image[0] : null;
-    console.log(imageFile);
     
   
     if (imageFile) {
@@ -115,9 +114,7 @@ router.put('/Update/Data/:id', upload, async (req, res) => {
       }
     }
   
-    const files = req.files?.files || [];
-    console.log(files);
-    
+    const files = req.files?.files || [];    
     let attrachment = [];
   
     for (const item of files) {
@@ -238,7 +235,7 @@ router.post('/getUser', async (req, res) => {
     const { userInput, password } = req.body;
     // Query to find user by either name or email
     const user = await User.find({
-      $or: [{ name: userInput }, { email: userInput }],
+      $or: [{ name: userInput }],
       password: password
     });
     if (!user) {
